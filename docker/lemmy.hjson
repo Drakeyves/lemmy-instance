@@ -2,27 +2,40 @@
   # for more info about the config, check out the documentation
   # https://join-lemmy.org/docs/en/administration/configuration.html
 
-  # This is a minimal lemmy config for the dev / main branch. Do not use for a 
-  # release / stable version.
-
-  setup: {
-    admin_username: "lemmy"
-    admin_password: "lemmylemmy"
-    site_name: "lemmy-dev"
-  }
-  database: {
-    connection: "postgres://lemmy:password@postgres:5432/lemmy"
-  }
+  # This is a minimal Lemmy config file that contains the essentials
 
   hostname: "localhost"
-  bind: "0.0.0.0"
   port: 8536
-
+  bind: "0.0.0.0"
+  
+  database: {
+    connection: "postgres://lemmy:password@postgres:5432/lemmy"
+    pool_size: 10
+  }
+  
   pictrs: {
     url: "http://pictrs:8080/"
-    # api_key: "API_KEY"
-    image_mode: None
+  }
+  
+  setup: {
+    admin_username: "admin"
+    admin_password: "password"
+    site_name: "Local Lemmy"
   }
 
-  #opentelemetry_url: "http://otel:4137"
+  # Comment out federation for local development
+  # federation: {
+  #  enabled: true
+  #  tls_enabled: true
+  # }
+  
+  # Simplified email config - only include for production
+  # email: {
+  #  smtp_server: "smtp.example.com"
+  #  smtp_login: "noreply@example.com"
+  #  smtp_password: "password"
+  #  smtp_from_address: "noreply@example.com"
+  #  tls_type: "starttls"
+  # }
 }
+
