@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=lemmy
+      - POSTGRES_DB=lemmy
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lemmy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  lemmy:
+    image: dessalines/lemmy:0.19.3
+    environment:
+      - RUST_LOG=debug
+      - LEMMY_DATABASE_URL=postgres://lemmy:password@postgres:5432/lemmy
+    ports:
+      - "8536:8536"
+    volumes:
+      - ./config:/config
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8536/api/v3/site || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  lemmy-ui:
+    image: dessalines/lemmy-ui:0.19.3
+    environment:
+      - LEMMY_INTERNAL_HOST=lemmy:8536
+      - LEMMY_EXTERNAL_HOST=your-ip-or-domain:8536
+      - LEMMY_UI_DEBUG=true
+      - LEMMY_HTTPS=false
+    ports:
+      - "1234:1234"
+    depends_on:
+      - lemmy
+    restart: always
+
+  # Add a monitoring proxy
+  monitoring-proxy:
+    image: nginx:alpine
+    ports:
+      - "8080:80"  # This will be your monitoring endpoint
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - lemmy
+    restart: always
+
+volumes:
+  postgres_data: 

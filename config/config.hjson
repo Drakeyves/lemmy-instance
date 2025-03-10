@@ -1,5 +1,38 @@
 # See the documentation for available config fields and descriptions:
 # https://join-lemmy.org/docs/en/administration/configuration.html
 {
-  hostname: lemmy-alpha
+  database: {
+    user: lemmy
+    password: password
+    host: postgres
+    port: 5432
+    database: lemmy
+  }
+  hostname: your-ip-or-domain
+  bind: 0.0.0.0
+  port: 8536
+  federation: {
+    enabled: false
+  }
+  setup: {
+    admin_username: admin
+    admin_password: password1234
+    site_name: R-Temp
+  }
+  
+  # Added logging configuration to direct logs to you
+  logging: {
+    level: debug
+    log_file: "/app/lemmy.log"  # Log file inside the container
+  }
+  
+  # Add webhook notifications for all activity
+  # Replace with your actual webhook endpoint URL
+  webhook: {
+    url: "https://your-webhook-url.com/api/receive"
+    username: "lemmy-notifier"
+    password: "your-secure-password"
+    # Set to true to receive notification for all activities
+    send_all_activities: true
+  }
 }
